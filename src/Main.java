@@ -1,3 +1,8 @@
+import org.nocrala.tools.texttablefmt.BorderStyle;
+import org.nocrala.tools.texttablefmt.CellStyle;
+import org.nocrala.tools.texttablefmt.ShownBorders;
+import org.nocrala.tools.texttablefmt.Table;
+
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +67,8 @@ public class Main {
                     }
                     break;
                 case 2:
+                    CellStyle numberStyle = new CellStyle(CellStyle.HorizontalAlign.center);
+                    Table table = new Table(5 , BorderStyle.UNICODE_BOX , ShownBorders.ALL);
                     System.out.println("---------- Display All Movie----------");
                     if(movies.isEmpty()){
                         System.out.println("No Movie Found!");
