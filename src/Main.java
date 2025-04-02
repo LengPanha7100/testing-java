@@ -2,17 +2,15 @@ import org.nocrala.tools.texttablefmt.BorderStyle;
 import org.nocrala.tools.texttablefmt.CellStyle;
 import org.nocrala.tools.texttablefmt.ShownBorders;
 import org.nocrala.tools.texttablefmt.Table;
-
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
-
 public class Main {
     public static final String RED = "\u001B[31m";   // Red color
     public static final String GREEN = "\u001B[32m"; // Green color
     public static final String RESET = "\u001B[0m";  // Reset color
+    public static final String PINK = "\u001B[35m"; // Pink/Magenta color
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         List<Movie> movies = new ArrayList<>(); // list to store movie
@@ -28,7 +26,7 @@ public class Main {
         int seat = 0;
 
         do{
-            System.out.println("----------  Movie Management System  --------");
+            System.out.println("\n----------  Movie Management System  --------");
             System.out.println("1- Insert Movie");
             System.out.println("2- Check & Booking Movie");
             System.out.println("3- Check Ticket");
@@ -67,15 +65,37 @@ public class Main {
                     }
                     break;
                 case 2:
-                    CellStyle numberStyle = new CellStyle(CellStyle.HorizontalAlign.center);
-                    Table table = new Table(5 , BorderStyle.UNICODE_BOX , ShownBorders.ALL);
+                    CellStyle style = new CellStyle(CellStyle.HorizontalAlign.center);
+                    Table table = new Table(5, BorderStyle.UNICODE_BOX,ShownBorders.ALL);
+                    table.setColumnWidth(0, 15, 20);
+                    table.setColumnWidth(1, 15, 20);
+                    table.setColumnWidth(2, 15, 20);
+                    table.setColumnWidth(3, 15, 20);
+                    table.setColumnWidth(4, 15, 20);
                     System.out.println("---------- Display All Movie----------");
                     if(movies.isEmpty()){
                         System.out.println("No Movie Found!");
                     }else {
+                        Table table1 = new Table(8, BorderStyle.UNICODE_BOX, ShownBorders.ALL);
+                        table1.setColumnWidth(0, 10, 15);
+                        table1.setColumnWidth(1, 25, 25);
+                        table1.setColumnWidth(2, 25, 25);
+                        table1.setColumnWidth(3, 10, 15);
+                        table1.setColumnWidth(4, 10, 15);
+                        table1.setColumnWidth(5, 10, 15);
+                        table1.setColumnWidth(6, 10, 15);
+                        table1.setColumnWidth(7, 10, 15);
+                        // Add headers (outside the loop)
+                        table1.addCell(GREEN+"ID", style);
+                        table1.addCell(GREEN+"Movie Name", style);
+                        table1.addCell(GREEN+"Type", style);
+                        table1.addCell(GREEN+"Duration", style);
+                        table1.addCell(GREEN+"Hall", style);
+                        table1.addCell(GREEN+"Seat", style);
+                        table1.addCell(GREEN+"Available", style);
+                        table1.addCell(GREEN+"Unavailable", style);
                         int available = 0;
                         int unavailable = 0;
-                        System.out.println("ID" + "\t\t\tMovie " + "\t\t\t\t\tType" + "\t\t\t\t\tDuration" + "\t\tHall" + "\t\tSeat" + "\t\tAvailable" + "\t\tUnavailable");
                         for (Movie movie : movies) {
                             int hallIndex = movie.getId() -1;
                             for(int i=0 ;i<arr[hallIndex].length;i++){
@@ -85,23 +105,33 @@ public class Main {
                                     unavailable++;
                                 }
                             }
-                            System.out.println(movie.getId() +"\t\t\t"+ movie.getName()+"\t\t\t"+movie.getType()+"\t\t\t\t\t"+movie.getDuration()+"\t\t\t\t" + movie.getHall()+"\t\t\t"+movie.getSeat() +"\t\t\t\t" + available +"\t\t\t\t" +unavailable+"\t\t\t");
+                            table1.addCell(PINK+String.valueOf(movie.getId()),style);
+                            table1.addCell(PINK+movie.getName(),style);
+                            table1.addCell(PINK+movie.getType(),style);
+                            table1.addCell(PINK+String.valueOf(movie.getDuration()),style);
+                            table1.addCell(PINK+String.valueOf(movie.getHall()),style);
+                            table1.addCell(PINK+String.valueOf(movie.getSeat()),style);
+                            table1.addCell(PINK+String.valueOf(available),style);
+                            table1.addCell(PINK+String.valueOf(unavailable),style);
                         }
+                        System.out.println(table1.render());
+
                         System.out.print("-> Enter movie’s Id to detail :");
                         int id = scanner.nextInt();
                         System.out.println("-------------------- Screen Hall #"+hallNumber+"--------------------");
                         for (int i=0 ; i<arr[id-1].length ; i++) {
                             if(arr[id-1][i] == 0){
-                                System.out.print(GREEN+"(+)"+(i+1)+RESET+"\t\t");
+                                table.addCell(GREEN+"(+)"+(i+1)+RESET,style);
                                 available++;
                             }else {
-                                System.out.print(RED+"(-)"+(i+1)+RESET+"\t\t");
+                                table.addCell(RED+"(-)"+(i+1)+RESET , style);
                                 unavailable++;
                             }
                             if((i+1)%5 == 0){
                                 System.out.println();
                             }
                         }
+                        System.out.print(table.render());
                         System.out.print("\n\n-> Choose seat that you want to booking(e.g:1,2,3,4):");
                         seat = scanner.nextInt();
                         scanner.nextLine();
@@ -126,34 +156,42 @@ public class Main {
                         }
 
                             // Re-display the updated seating availability after booking
-                            System.out.println("\nUpdated seating availability:");
+
+                            System.out.println("Updated seating availability:");
+                            table = new Table(5, BorderStyle.UNICODE_BOX, ShownBorders.ALL);
+                            table.setColumnWidth(0, 15, 20);
+                            table.setColumnWidth(1, 15, 20);
+                            table.setColumnWidth(2, 15, 20);
+                            table.setColumnWidth(3, 15, 20);
+                            table.setColumnWidth(4, 15, 20);
                             available = 0;
                             unavailable = 0;
                             for (int i = 0; i < arr[id - 1].length; i++) {
                                 if (arr[id - 1][i] == 0) {
-                                    System.out.print(GREEN + "(+)" + (i + 1) + RESET + "\t\t");
+                                    table.addCell(GREEN + "(+)" + (i + 1) + RESET ,style);
                                     available++;
                                 } else {
-                                    System.out.print(RED + "(-)" + (i + 1) + RESET + "\t\t");
+                                    table.addCell(RED + "(-)" + (i + 1) + RESET ,style);
                                     unavailable++;
                                 }
                                 if ((i + 1) % 5 == 0) {
                                     System.out.println();
                                 }
                             }
+                        System.out.println(table.render());
 
                     }
                     break;
                 case 3:
-                    System.out.println("==================================");
+                    System.out.println("\n\n==================================");
                     System.out.println("Your ticket has been booked!");
-                    System.out.println("==================================");
+                    System.out.println("==================================\n");
                     System.out.println("Hall: #"+hallNumber+"");
                     for (Movie movie : movies) {
                         System.out.println("\t\t\t "+movie.getName()+"");
                         System.out.println(seat);
                     }
-                    System.out.println("-----------------------------");
+                    System.out.println("\n-----------------------------");
                     break;
                 case 4:
                     System.out.print("  => All Hall was reset with all seats available? (y/n): ");
@@ -172,7 +210,7 @@ public class Main {
                                 }
                             }
                             System.out.println("\t\t All halls were reset successfully!");
-                            break;  // Exit loop after reset
+                            break;
                         } else {
                             System.out.print("Invalid input! Please enter Y or N: ");
                         }
